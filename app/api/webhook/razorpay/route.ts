@@ -1,5 +1,5 @@
 
-import { connectToDatabase } from "@/app/lib/db";
+import { connectToDatabase } from "@/lib/db";
 import Order from "@/models/Orders";
 import nodemailer from 'nodemailer';
 import crypto, { sign } from "crypto";
