@@ -37,9 +37,12 @@ export default function FileUpload({
     return (
         <div className="space y-2">
          <IKUpload fileName="product-image.jpg"
-         publicKey={process.env.NEXT_PUBLIC_PUBLIC_KEY} 
+         publicKey={process.env.NEXT_PUBLIC_KEY} 
          urlEndpoint={process.env.NEXT_PUBLIC_URL_ENDPOINT}
          authenticator={async () => {
+
+
+           
     const res = await fetch("/api/auth/upload-auth");
     return res.json();
          }}
