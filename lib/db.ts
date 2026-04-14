@@ -16,7 +16,7 @@ if(!cached){
 // MONGODB_URL
 export async function connectToDatabase(){
 
-    console.log("Connecting to:",process.env.MONGODB_URl);
+    console.log("Connecting to:",process.env.MONGODB_URL);
     const uri: string = process.env.MONGODB_URL!;
 
     if(cached.conn){

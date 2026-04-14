@@ -29,14 +29,14 @@ export const authOptions:NextAuthOptions={
                         console.log("User not found");
                         return null;
                     }
-                    console.log("Enterd password",credentials.password);
-                    console.log("Stored password",user.password);
-                    const manualTest = await bcrypt.compare("test123", user.password);
-                   console.log("Manual test (test123):", manualTest);
-                    const isValid=await bcrypt.compare(
-                        credentials.password.trim(),
-                        user.password
-                    );
+                  const enteredPassword = credentials.password.trim();
+
+console.log("Entered password:", enteredPassword);
+console.log("Stored hash:", user.password);
+
+const isValid = await bcrypt.compare(enteredPassword, user.password);
+
+console.log("Password match:", isValid);
                     console.log("Password match:", isValid);
                     if(!isValid){
                         return null;

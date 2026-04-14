@@ -18,8 +18,8 @@ export async function POST(request: NextRequest) {
     }
 
     // ✅ Normalize input
-    const normalizedEmail = email.toLowerCase().trim();
-    const trimmedPassword = password.trim();
+    const normalizedEmail = email.trim().toLowerCase();
+    
 
     // ✅ Check existing user
     const existingUser = await User.findOne({ email: normalizedEmail });
@@ -31,13 +31,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ✅ Hash password
-   
-
-    // ✅ Create user
     const newUser = await User.create({
       email: normalizedEmail,
-      password: trimmedPassword,
+      password:password,
       role: "user",
     });
 
@@ -47,6 +43,7 @@ export async function POST(request: NextRequest) {
         user: {
           id: newUser._id,
           email: newUser.email,
+          role:newUser.role,
         },
       },
       { status: 201 }
