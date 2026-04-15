@@ -23,9 +23,14 @@ export interface ImageVariant {
 }
 
 export interface IProduct {
-  _id?: string; // 👈 IMPORTANT (not mongoose type)
+  _id: string; // 👈 IMPORTANT (not mongoose type)
+   
   name: string;
   description: string;
   imageUrl: string;
   variants: ImageVariant[];
 }
+
+export type CreateProductResponse = {
+  newProduct: IProduct;
+};

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import FileUpload from "./FileUpload";
 import { IKUploadResponse } from "imagekitio-next/dist/types/components/IKUpload/props";
@@ -8,11 +8,14 @@ import { Loader2, Plus, Trash2 } from "lucide-react";
 import { useNotification } from "./Notification";
 import { IMAGE_VARIANTS, ImageVariantType } from "@/constants/imageVariants";
 import { apiClient, ProductFormData } from "@/lib/api-client";
+import {useRouter} from "next/navigation";
+import { CreateProductResponse } from "@/types/Product";
 
-export default function AdminProductForm() {
+
+export default function AdminProductForm():React.ReactElement {
   const [loading, setLoading] = useState(false);
   const { showNotification } = useNotification();
-
+   const router=useRouter();
   const {
     register,
     control,
@@ -42,15 +45,20 @@ export default function AdminProductForm() {
   const handleUploadSuccess = (response: IKUploadResponse) => {
     setValue("imageUrl", response.filePath);
     showNotification("Image uploaded successfully!", "success");
+
   };
 
   const onSubmit = async (data: ProductFormData) => {
     setLoading(true);
     try {
-      await apiClient.createProduct(data);
+     const res:CreateProductResponse=await apiClient.createProduct(data);
       showNotification("Product created successfully!", "success");
-
+        // router.push(`/Pro/}`);
       // Reset form after successful submission
+     setTimeout(()=>{
+         router.push(`/products/${res.newProduct._id}`);
+     },1000)
+
       setValue("name", "");
       setValue("description", "");
       setValue("imageUrl", "");
@@ -202,9 +210,12 @@ export default function AdminProductForm() {
           "Create Product"
         )}
       </button>
+      
+      
     </form>
     </>
   );
 }
+
 
 

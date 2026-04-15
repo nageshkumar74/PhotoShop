@@ -28,22 +28,44 @@ export default function ProductPage() {
   const { showNotification } = useNotification();
   const router = useRouter();
   const { data: session } = useSession();
+  const handleDelete = async () => {
+    try {
+      if (!product?._id) {
+        setError("Invalid Product");
+        return;
+      }
+      const res=await fetch(`/api/products?id=${product._id}`,{
+        method:"DELETE"
+      })
+        const deletedProduct=await res.json();
+        if(!res.ok){
+          setError(deletedProduct.error||"Product not deleted");
+        }
+        else {
+          router.push("/");
+        }
+      }
+    
+    catch (error) {
 
+      setError("Failed to delete Product.please try again");
+    }
+  }
   // ✅ Properly typed transformation
-  
-  const getTransformation = (variantType: ImageVariantType)=> {
-  const variant = IMAGE_VARIANTS[variantType];
 
-  return [
-    {
-      width: variant.dimensions.width.toString(),
-      height: variant.dimensions.height.toString(),
-      cropMode: "extract" as "extract",
-      focus: "center" as "center",
-      quality: 60,
-    },
-  ];
-};
+  const getTransformation = (variantType: ImageVariantType) => {
+    const variant = IMAGE_VARIANTS[variantType];
+
+    return [
+      {
+        width: variant.dimensions.width.toString(),
+        height: variant.dimensions.height.toString(),
+        cropMode: "extract" as "extract",
+        focus: "center" as "center",
+        quality: 60,
+      },
+    ];
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -138,9 +160,8 @@ export default function ProductPage() {
             className="relative rounded-lg overflow-hidden"
             style={{
               aspectRatio: selectedVariant
-                ? `${IMAGE_VARIANTS[selectedVariant.type].dimensions.width} / ${
-                    IMAGE_VARIANTS[selectedVariant.type].dimensions.height
-                  }`
+                ? `${IMAGE_VARIANTS[selectedVariant.type].dimensions.width} / ${IMAGE_VARIANTS[selectedVariant.type].dimensions.height
+                }`
                 : "1 / 1",
             }}
           >
@@ -182,11 +203,10 @@ export default function ProductPage() {
             {product.variants.map((variant) => (
               <div
                 key={variant.type}
-                className={`card bg-base-200 cursor-pointer hover:bg-base-300 transition ${
-                  selectedVariant?.type === variant.type
+                className={`card bg-base-200 cursor-pointer hover:bg-base-300 transition ${selectedVariant?.type === variant.type
                     ? "ring-2 ring-primary"
                     : ""
-                }`}
+                  }`}
                 onClick={() => setSelectedVariant(variant)}
               >
                 <div className="card-body p-4">
@@ -232,7 +252,21 @@ export default function ProductPage() {
                         Buy Now
                       </button>
                     </div>
+                   
                   </div>
+                  {
+                    session?.user?.role==="admin" &&(
+                      <div className="flex gap-2">
+                        <button className="px-4 py-2 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 active:scale-95 transition duration-200" onClick={handleDelete}></button>
+                        <button className="px-4 py-2 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 active:scale-95 transition duration-200" onClick={handleDelete} >
+                        Delete
+                      </button>
+                      {error && <p className="text-danger">{error}</p>} 
+                           
+                        </div>
+                    )
+                  }
+
                 </div>
               </div>
             ))}
@@ -253,6 +287,7 @@ export default function ProductPage() {
                 </li>
               </ul>
             </div>
+ 
           </div>
         </div>
       </div>

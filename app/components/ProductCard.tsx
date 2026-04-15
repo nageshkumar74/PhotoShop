@@ -2,12 +2,52 @@ import { IKImage } from "imagekitio-next";
 import Link from "next/link";
 import { IProduct, IMAGE_VARIANTS } from "@/types/Product";
 import { Eye } from "lucide-react";
+import React, { useState } from "react";
+import products from "razorpay/dist/types/products";
 
-export default function ProductCard({ product }: { product: IProduct }) {
+
+export default function ProductCard({ product,onDelete }: { product: IProduct ,onDelete:(_id:string)=>void}) {
+
+  const [error, setError] = useState<string | null>(null);
+ 
   const lowestPrice = product.variants.reduce(
     (min, variant) => (variant.price < min ? variant.price : min),
     product.variants[0]?.price || 0
   );
+
+  const handleDelete = async() => {
+    //Delete Product 
+
+    try {
+     
+      const response=await fetch(`/api/products?id=${product._id}`,{
+        method:"DELETE"
+      })
+      const data=await response.json();
+      
+
+       onDelete(product._id);
+
+
+      
+      
+
+      if(!response.ok){
+       setError(data.error||"Failed to delete Product");
+
+      }
+      else {
+        console.log(data.message||"Product deleted Successfully");
+
+      }
+    }
+    catch (error) {
+      setError("Failed to delete Product.please try again");
+    }
+
+  }
+
+
 
   return (
     <div className="card bg-base-100 shadow hover:shadow-lg transition-all duration-300">
@@ -34,7 +74,7 @@ export default function ProductCard({ product }: { product: IProduct }) {
                   width: IMAGE_VARIANTS.SQUARE.dimensions.width.toString(),
                   cropMode: "extract",
                   focus: "center",
-                
+
                 },
               ]}
               className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -73,6 +113,8 @@ export default function ProductCard({ product }: { product: IProduct }) {
             <Eye className="w-4 h-4" />
             View Options
           </Link>
+
+         
         </div>
       </div>
     </div>
