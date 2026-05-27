@@ -112,17 +112,49 @@ export default function ProductPage() {
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount,
-        currency: "USD",
+        currency: "INR",
         name: "ImageKit Shop",
         description: `${product.name} - ${variant.type} Version`,
         order_id: orderId,
+        method:{
+           upi:true,card:true,netbanking:true,wallet:true
+        },
+        // config:{
+        //   display:{
+        //     sequence:["block.upi","block.card"],
+
+        //     blocks:{
+        //       upi:{
+        //         name:'Pay using UPI',
+        //         instruments:[
+        //           {
+        //             method:"upi"
+        //           },
+        //         ],
+
+        //       },
+        //       card:{
+        //         name:'Pay using Card',
+        //         instruments:[
+        //           {
+        //             method:"card"
+        //           },
+        //         ],
+        //       },
+            //},
+         // },
+        
         handler: function () {
           showNotification("Payment successful!", "success");
           router.push("/orders");
         },
         prefill: {
           email: session.user.email,
+          contact:"9284574695",
         },
+        theme:{
+          color:"#2563eb"
+        }
       };
 
       const rzp = new (window as any).Razorpay(options);
