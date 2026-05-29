@@ -5,6 +5,10 @@ import mongoose from 'mongoose';
 
 import { getServerSession } from "next-auth/next";
 import { NextResponse, NextRequest } from "next/server";
+
+
+
+
 export async function GET() {
     try {
         await connectToDatabase();
@@ -23,9 +27,11 @@ export async function POST(request: NextRequest) {
     try {
         await connectToDatabase();
         const session = await getServerSession(authOptions);
-        const allowedRoles = ["admin", "user"];
-        if (!session || !allowedRoles.includes(session.user?.role)) {
-            return NextResponse.json({ error: "Unauthorised" }, { status: 401 })
+        if (!session || session.user.role !== "admin") {
+            return NextResponse.json(
+                { error: "Forbidden" },
+                { status: 403 }
+            );
         }
 
         const body: IProduct = await request.json();
@@ -66,10 +72,10 @@ export async function DELETE(request: NextRequest) {
                 return NextResponse.json({ error: "Product ID is required" }, { status: 400 })
             }
 
-            if(!mongoose.Types.ObjectId.isValid(productID)){
+            if (!mongoose.Types.ObjectId.isValid(productID)) {
 
 
-                return NextResponse.json({error:"Invalid Product ,Id"},{status:400})
+                return NextResponse.json({ error: "Invalid Product ,Id" }, { status: 400 })
             }
             else {
                 const deletedProduct = await Product.findByIdAndDelete(productID);

@@ -31,13 +31,13 @@ export const authOptions:NextAuthOptions={
                     }
                   const enteredPassword = credentials.password.trim();
 
-console.log("Entered password:", enteredPassword);
-console.log("Stored hash:", user.password);
+// console.log("Entered password:", enteredPassword);
+// console.log("Stored hash:", user.password);
 
 const isValid = await bcrypt.compare(enteredPassword, user.password);
 
-console.log("Password match:", isValid);
-                    console.log("Password match:", isValid);
+// console.log("Password match:", isValid);
+//                     console.log("Password match:", isValid);
                     if(!isValid){
                         return null;
                     }
