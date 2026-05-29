@@ -5,7 +5,6 @@ import { Eye } from "lucide-react";
 import React, { useState } from "react";
 import products from "razorpay/dist/types/products";
 
-
 export default function ProductCard({ product,onDelete }: { product: IProduct ,onDelete:(_id:string)=>void}) {
 
   const [error, setError] = useState<string | null>(null);
