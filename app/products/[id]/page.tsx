@@ -1,6 +1,7 @@
 "use client";
 
 import { IKImage } from "imagekitio-next";
+import crypto from "crypto";
 
 import {
   ImageVariant,
@@ -99,7 +100,7 @@ export default function ProductPage() {
     }
 
     if (!product?._id) {
-      showNotification("Invalid product", "error");
+      showNotification("Invalid product", "error");s
       return;
     }
 
@@ -144,9 +145,42 @@ export default function ProductPage() {
             //},
          // },
         
-        handler: function () {
-          showNotification("Payment successful!", "success");
-          router.push("/orders");
+        handler: async function (response: any) {
+          try {
+            console.log("✅ Payment successful, marking order as completed...");
+            
+            // Mark order as completed on server
+            const markRes = await fetch('/api/orders', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'mark-completed',
+                dbOrderId: orderId,
+                paymentId: response.razorpay_payment_id,
+              }),
+            });
+
+            const markData = await markRes.json();
+
+            if (markData.success) {
+              showNotification("Payment verified! Order updated ✅", "success");
+              setTimeout(() => {
+                window.location.href = "/orders";
+              }, 1500);
+            } else {
+              console.error("Mark failed:", markData);
+              showNotification("Payment completed but order update delayed", "warning");
+              setTimeout(() => {
+                window.location.href = "/orders";
+              }, 1500);
+            }
+          } catch (error) {
+            console.error("Handler error:", error);
+            showNotification("Payment processed - redirecting", "success");
+            setTimeout(() => {
+              window.location.href = "/orders";
+            }, 1500);
+          }
         },
         prefill: {
           email: session.user.email,
@@ -272,7 +306,7 @@ export default function ProductPage() {
 
                     <div className="flex items-center gap-4">
                       <span className="text-xl font-bold">
-                        ${variant.price.toFixed(2)}
+                        ₹{variant.price.toFixed(2)}
                       </span>
                       <button
                         className="btn btn-primary btn-sm"

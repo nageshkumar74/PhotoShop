@@ -9,27 +9,27 @@ import Link from "next/link";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showSuccess, setShowSuccess] = useState(false);
-  const router = useRouter();
-  const { showNotification } = useNotification();
+  
+const [formNotification, setFormNotification] = useState<{
+  message: string;
+  type: "success" | "error" | "warning" | "info";
+} | null>(null);
 
+// Add this helper function
+const showFormNotification = (message: string, type: "success" | "error" | "warning" | "info") => {
+  setFormNotification({ message, type });
+  setTimeout(() => setFormNotification(null), 3000);
+};
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const result = await signIn("credentials", {
       email,
       password,
-      redirect: false,
+      redirect: true,
+      callbackUrl: "/",
     });
-
     if (result?.error) {
-      showNotification(result.error, "error");
-      setShowSuccess(false);
-    } else {
-      setShowSuccess(true);
-      showNotification("Login successful!", "success");
-      setTimeout(() => {
-        router.push("/");
-      }, 1500);
+      showFormNotification("Invalid email or password", "error");
     }
   };
 
@@ -70,9 +70,10 @@ export default function Login() {
         >
           Login
         </button>
-        {showSuccess && (
-          <div className="mt-3 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
-            ✓ Login successful! Redirecting...
+        {formNotification && (
+          <div className={`alert alert-${formNotification.type} mt-4`}>
+            <span>{formNotification.message}</span>
+            
           </div>
         )}
         <p className="text-center mt-4">

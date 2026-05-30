@@ -13,20 +13,33 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const { data: session } = useSession();
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const data = await apiClient.getUserOrders();
-        setOrders(data);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchOrders = async () => {
+    try {
+      const data = await apiClient.getUserOrders();
+      setOrders(data);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (session) fetchOrders();
   }, [session]);
+
+  // Refetch orders every 3 seconds for 30 seconds to catch webhook updates
+  useEffect(() => {
+    const hasPendingOrders = orders.some(order => order.status === "pending");
+    
+    if (!hasPendingOrders) return;
+
+    const interval = setInterval(() => {
+      fetchOrders();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [orders]);
 
   if (loading) {
     return (
@@ -118,7 +131,7 @@ export default function OrdersPage() {
 
                       <div className="text-right">
                         <p className="text-2xl font-bold mb-4">
-                          ${order.amount.toFixed(2)}
+                          ₹{(order.amount/100).toFixed(2)}
                         </p>
                         {order.status === "completed" && (
                           <a

@@ -15,7 +15,16 @@ import { CreateProductResponse } from "@/types/Product";
 export default function AdminProductForm():React.ReactElement {
   const [loading, setLoading] = useState(false);
   const { showNotification } = useNotification();
-   const router=useRouter();
+  const [formNotification, setFormNotification] = useState<{
+    message: string;
+    type: "success" | "error" | "warning" | "info";
+  } | null>(null);
+  const router=useRouter();
+
+  const showFormNotification = (message: string, type: "success" | "error" | "warning" | "info") => {
+    setFormNotification({ message, type });
+    setTimeout(() => setFormNotification(null), 3000);
+  };
   const {
     register,
     control,
@@ -52,7 +61,7 @@ export default function AdminProductForm():React.ReactElement {
     setLoading(true);
     try {
      const res:CreateProductResponse=await apiClient.createProduct(data);
-      showNotification("Product created successfully!", "success");
+      showFormNotification("Product created successfully!", "success");
         // router.push(`/Pro/}`);
       // Reset form after successful submission
      setTimeout(()=>{
@@ -70,7 +79,7 @@ export default function AdminProductForm():React.ReactElement {
         },
       ]);
     } catch (error) {
-      showNotification(
+      showFormNotification(
         error instanceof Error ? error.message : "Failed to create product",
         "error"
       );
@@ -211,6 +220,11 @@ export default function AdminProductForm():React.ReactElement {
         )}
       </button>
       
+      {formNotification && (
+        <div className={`alert alert-${formNotification.type} mt-4`}>
+          <span>{formNotification.message}</span>
+        </div>
+      )}
       
     </form>
     </>

@@ -34,7 +34,7 @@ export default function Register() {
       }
 
       showNotification("Registration successful! Please log in.", "success");
-      router.push("/login");
+      setTimeout(() => router.push("/login"), 1500);
     } catch (error) {
       showNotification(
         error instanceof Error ? error.message : "Registration failed",

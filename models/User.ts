@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 export interface IUser {
   email: string;
   password: string;
+  name?: string;
   role: "user" | "admin";
   _id?: mongoose.Types.ObjectId;
   createdAt?: Date;
@@ -16,13 +17,17 @@ const userSchema = new Schema<IUser>(
       type: String, 
       required: true, 
       unique: true,
-      lowercase: true,   // ✅ added
-      trim: true         // ✅ added
+      lowercase: true,
+      trim: true
+    },
+    name: {
+      type: String,
+      default: null
     },
     password: { 
       type: String, 
       required: true,
-      select: false      // ✅ added (important for security)
+      select: false
     },
     role: { 
       type: String, 
