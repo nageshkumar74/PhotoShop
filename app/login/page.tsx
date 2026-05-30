@@ -9,6 +9,7 @@ import Link from "next/link";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
   const router = useRouter();
   const { showNotification } = useNotification();
 
@@ -22,9 +23,13 @@ export default function Login() {
 
     if (result?.error) {
       showNotification(result.error, "error");
+      setShowSuccess(false);
     } else {
+      setShowSuccess(true);
       showNotification("Login successful!", "success");
-      router.push("/");
+      setTimeout(() => {
+        router.push("/");
+      }, 1500);
     }
   };
 
@@ -65,6 +70,11 @@ export default function Login() {
         >
           Login
         </button>
+        {showSuccess && (
+          <div className="mt-3 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
+            ✓ Login successful! Redirecting...
+          </div>
+        )}
         <p className="text-center mt-4">
           Don&apos;t have an account?{" "}
           <Link href="/register" className="text-blue-500 hover:text-blue-600">
