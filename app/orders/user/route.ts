@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/db"
 import Order from "@/models/Orders";
-
+import Product from "@/models/Products"
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);

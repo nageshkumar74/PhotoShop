@@ -1,8 +1,8 @@
 
 "use client"
-import  React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import  { IOrder } from "@/types/Order";
+import { IOrder } from "@/types/Order";
 import { Loader2, Download } from "lucide-react";
 import { IKImage } from "imagekitio-next";
 import { IMAGE_VARIANTS } from "@/constants/imageVariants";
@@ -12,7 +12,7 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<IOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const { data: session } = useSession();
-
+console.log("NEXT_PUBLIC_URL_ENDPOINT =", process.env.NEXT_PUBLIC_URL_ENDPOINT);
   const fetchOrders = async () => {
     try {
       const data = await apiClient.getUserOrders();
@@ -31,7 +31,7 @@ export default function OrdersPage() {
   // Refetch orders every 3 seconds for 30 seconds to catch webhook updates
   useEffect(() => {
     const hasPendingOrders = orders.some(order => order.status === "pending");
-    
+
     if (!hasPendingOrders) return;
 
     const interval = setInterval(() => {
@@ -41,6 +41,7 @@ export default function OrdersPage() {
     return () => clearInterval(interval);
   }, [orders]);
 
+
   if (loading) {
     return (
       <div className="min-h-[70vh] flex justify-center items-center">
@@ -49,6 +50,31 @@ export default function OrdersPage() {
     );
   }
 
+
+  const handleDownload=async(
+    imageUrl:string,
+    width:number,
+    height:number,
+    orderId:string
+  )=>{
+    const cleanImageUrl=imageUrl.replace(/^\/+/,"");
+
+    const downloadUrl=`${process.env.NEXT_PUBLIC_URL_ENDPOINT}/${cleanImageUrl}`
+    console.log("Download URL:", downloadUrl);
+    const response=await fetch(downloadUrl);
+
+    const blob=await response.blob();
+    const blobUrl=window.URL.createObjectURL(blob);
+
+    const link=document.createElement("a");
+    link.href=blobUrl;
+    link.download=`image-${orderId.slice(-6)}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+      document.body.removeChild(link);
+  window.URL.revokeObjectURL(blobUrl);
+}
+  
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">My Orders</h1>
@@ -82,7 +108,7 @@ export default function OrdersPage() {
                       alt={`Order ${order._id?.toString().slice(-6)}`}
                       transformation={[
                         {
-                          
+
                           width: variantDimensions.width.toString(),
                           height: variantDimensions.height.toString(),
                           cropMode: "extract",
@@ -115,13 +141,12 @@ export default function OrdersPage() {
                           <p>
                             Status:{" "}
                             <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                order.status === "completed"
-                                  ? "bg-success/20 text-success"
-                                  : order.status === "failed"
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${order.status === "completed"
+                                ? "bg-success/20 text-success"
+                                : order.status === "failed"
                                   ? "bg-error/20 text-error"
                                   : "bg-warning/20 text-warning"
-                              }`}
+                                }`}
                             >
                               {order.status}
                             </span>
@@ -131,21 +156,23 @@ export default function OrdersPage() {
 
                       <div className="text-right">
                         <p className="text-2xl font-bold mb-4">
-                          ₹{(order.amount/100).toFixed(2)}
+                          ₹{(order.amount / 100).toFixed(2)}
                         </p>
                         {order.status === "completed" && (
-                          <a
-                            href={`${process.env.NEXT_PUBLIC_URL_ENDPOINT}/tr:q-100,w-${variantDimensions.width},h-${variantDimensions.height},cm-extract,fo-center/${product.imageUrl}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <button
+                            onClick={() =>
+                              handleDownload(
+                                product.imageUrl,
+                                variantDimensions.width,
+                                variantDimensions.height,
+                                order._id?.toString() || ""
+                              )
+                            }
                             className="btn btn-primary gap-2"
-                            download={`image-${order._id
-                              ?.toString()
-                              .slice(-6)}.jpg`}
                           >
                             <Download className="w-4 h-4" />
                             Download High Quality
-                          </a>
+                          </button>
                         )}
                       </div>
                     </div>
