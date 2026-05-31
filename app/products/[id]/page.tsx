@@ -100,7 +100,7 @@ export default function ProductPage() {
     }
 
     if (!product?._id) {
-      showNotification("Invalid product", "error");s
+      showNotification("Invalid product", "error");
       return;
     }
 
