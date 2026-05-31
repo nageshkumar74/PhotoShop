@@ -12,7 +12,7 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<IOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const { data: session } = useSession();
-console.log("NEXT_PUBLIC_URL_ENDPOINT =", process.env.NEXT_PUBLIC_URL_ENDPOINT);
+
   const fetchOrders = async () => {
     try {
       const data = await apiClient.getUserOrders();
@@ -60,7 +60,7 @@ console.log("NEXT_PUBLIC_URL_ENDPOINT =", process.env.NEXT_PUBLIC_URL_ENDPOINT);
     const cleanImageUrl=imageUrl.replace(/^\/+/,"");
 
     const downloadUrl=`${process.env.NEXT_PUBLIC_URL_ENDPOINT}/${cleanImageUrl}`
-    console.log("Download URL:", downloadUrl);
+   
     const response=await fetch(downloadUrl);
 
     const blob=await response.blob();
